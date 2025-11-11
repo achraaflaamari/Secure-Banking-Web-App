@@ -1,0 +1,28 @@
+# Global ignores
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+.idea/
+.vscode/
+*.iml
+
+# OS junk
+Thumbs.db
+
+# Node + Java
+node_modules/
+target/
+dist/
+build/
+out/
+
+# Ignore Docker artifacts
+*.pid
+docker-compose.override.yml
+
+# Ignore everything that can be regenerated
+**/.classpath
+**/.project
+**/.settings/
