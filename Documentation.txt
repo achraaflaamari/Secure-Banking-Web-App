@@ -1,0 +1,45 @@
+you are a security expert , you are going to help me to secure my system after development of my application . this application is a web application that is going to be used to make transactions between users. so we gonna have a user interface and a admin interface . the interface gonna be :
+
+user interface :
+login , register , dashboard , transactions , profile , logout
+
+admin interface :
+login , register , dashboard , transactions list , users list( manage it ) , profile , logout
+
+
+the user can :
+login
+create account
+make transactions
+view transactions history
+view  his profile and manage it
+logout
+
+the admin can :
+login
+create account
+manage users
+manage transactions
+view transactions history
+view his profile and manage it
+logout
+
+
+our data base contains the following tables :
+user : id , usernane , password , role
+profile : id , user id , fullname , email , phone , birthday , created_at , updated_at , is_active
+
+compte : id , user id , solde , is_active
+transaction : id , sender id , receiver id , amount , created_at , status
+
+
+so we gonna develop a secure banking application . you are to develop the application and secure it .
+
+we gonna use docker container to run the application . it contains :
+
+- spring boot backend
+- postgresql database
+- frontend interface : next js
+
+we start by this now we gonna make them secure and developpement all the app
+after that we all our functionnalities work well we can here add some other security features like load balancer .... .

@@ -5,12 +5,13 @@ WORKDIR /app
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
+COPY lombok.config .
 
 RUN ./mvnw dependency:go-offline
 
 COPY src src
 
-RUN ./mvnw package -DskipTests
+RUN ./mvnw clean package -DskipTests
 
 EXPOSE 8080
 

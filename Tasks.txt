@@ -1,0 +1,201 @@
+Secure Banking Application - KMA Project
+Project Overview
+Develop a secure web-based banking application with user and admin interfaces, using Spring Boot backend, PostgreSQL database, and Next.js frontend, all containerized with Docker.
+
+Phase 1: Project Setup & Infrastructure
+ Set up Docker environment
+ Create Docker Compose configuration
+ Configure PostgreSQL container
+ Configure Spring Boot backend container
+ Configure Next.js frontend container
+ Set up container networking
+ Initialize Spring Boot backend
+ Create Spring Boot project structure
+ Configure application properties
+ Set up database connection
+ Initialize Next.js frontend
+ Create Next.js project structure
+ Set up routing structure
+ Configure API connection to backend
+Phase 2: Database Design & Implementation
+ Design database schema
+ Create user table (id, username, password, role)
+ Create profile table (id, user_id, fullname, email, phone, birthday, created_at, updated_at, is_active)
+ Create compte table (id, user_id, solde, is_active)
+ Create transaction table (id, sender_id, receiver_id, amount, created_at, status)
+ Define foreign key relationships
+ Add indexes for performance
+ Create database migration scripts
+ Implement JPA entities in Spring Boot
+Phase 3: Backend Development - Authentication & Authorization
+ Implement authentication system
+ Create user registration endpoint
+ Create login endpoint with JWT token generation
+ Implement password hashing (BCrypt)
+ Create logout functionality
+ Implement role-based access control (RBAC)
+ Configure Spring Security
+ Define user and admin roles
+ Create authorization filters
+ Implement JWT token validation
+Phase 4: Backend Development - User Features
+ User management
+ Create user profile service
+ Implement profile view endpoint
+ Implement profile update endpoint
+ Create account (compte) service
+ Transaction functionality
+ Create transaction service
+ Implement transaction creation endpoint
+ Implement transaction validation logic
+ Implement balance update logic
+ Create transaction history endpoint
+ Implement transaction status management
+Phase 5: Backend Development - Admin Features
+ Admin user management
+ Create endpoint to list all users
+ Implement user activation/deactivation
+ Create user search/filter functionality
+ Implement user deletion (soft delete)
+ Admin transaction management
+ Create endpoint to list all transactions
+ Implement transaction filtering
+ Create transaction status update endpoint
+ Implement transaction reversal functionality
+Phase 6: Frontend Development - User Interface
+ Authentication pages
+ Create login page
+ Create registration page
+ Implement form validation
+ Implement JWT token storage
+ User dashboard
+ Create dashboard layout
+ Display account balance
+ Show recent transactions
+ Create navigation menu
+ Transaction features
+ Create transaction form
+ Implement recipient selection
+ Add amount validation
+ Create transaction confirmation dialog
+ Display transaction history page
+ Profile management
+ Create profile view page
+ Create profile edit form
+ Implement profile update functionality
+ Logout functionality
+Phase 7: Frontend Development - Admin Interface
+ Admin authentication
+ Create admin login page
+ Implement admin role verification
+ Admin dashboard
+ Create admin dashboard layout
+ Display system statistics
+ Show recent activities
+ User management interface
+ Create users list page
+ Implement user search/filter
+ Create user activation toggle
+ Add user details modal
+ Implement user deletion confirmation
+ Transaction management interface
+ Create transactions list page
+ Implement transaction filtering
+ Create transaction details modal
+ Add transaction status update controls
+ Admin profile management
+ Create admin profile page
+ Implement profile update functionality
+Phase 8: Basic Security Implementation
+ HTTPS/TLS configuration
+ Configure SSL/TLS certificates
+ Enable HTTPS in Spring Boot
+ Add HSTS headers
+ CORS configuration
+ Configure allowed origins
+ Set allowed methods and headers
+ Enable credentials support
+ Rate limiting
+ Implement request rate limiting
+ Configure rate limit thresholds
+ Add rate limit response headers
+ Input validation and sanitization
+ Add input validation annotations
+ Implement XSS prevention
+ Add SQL injection prevention
+ Sanitize user inputs
+ Security headers
+ Add X-XSS-Protection header
+ Add Content-Security-Policy header
+ Add X-Frame-Options header
+ Add X-Content-Type-Options header
+ Database security
+ Use parameterized queries (JPA)
+ Configure connection pooling
+ Add database access logging
+Phase 9: Security Implementation - Advanced
+ Implement audit logging
+ Log all authentication attempts
+ Log all transactions
+ Log admin actions
+ Create audit log viewer for admins
+ Add two-factor authentication (2FA)
+ Implement TOTP generation
+ Create 2FA setup flow
+ Add 2FA verification on login
+ Implement session management
+ Add session timeout (via JWT expiration)
+ Implement concurrent session control (Stateless JWT)
+ Create active sessions viewer (via Audit Logs)
+ Add transaction security
+ Implement transaction limits (via Validation)
+ Add fraud detection rules (Basic checks)
+ Create transaction approval workflow (Admin status update)
+ Implement transaction notifications (Audit Logs)
+Phase 10: Testing
+ Backend testing
+ Write unit tests for services
+ Write integration tests for APIs
+ Test authentication flows
+ Test authorization rules
+ Test transaction logic
+ Perform security testing
+ Frontend testing
+ Test user flows
+ Test admin flows
+ Test form validations
+ Test error handling
+ End-to-end testing
+ Test complete user journey
+ Test complete admin journey
+ Test security scenarios
+Phase 11: Advanced Features (Post-MVP)
+ Load balancer implementation
+ Configure load balancer in Docker (Nginx)
+ Set up multiple backend instances (Configured in Nginx)
+ Implement health checks (Actuator)
+ Additional security features
+ Implement intrusion detection (Basic logging)
+ Add API gateway (Nginx)
+ Set up WAF (Web Application Firewall) (Nginx/App Firewall)
+ Implement DDoS protection (Rate Limiting)
+ Monitoring and alerting
+ Set up application monitoring (Prometheus/Grafana)
+ Configure security alerts (Audit Logs)
+ Implement performance monitoring (Actuator)
+Phase 12: Deployment & Documentation
+ Deployment preparation
+ Create production Docker configurations
+ Set up environment variables
+ Configure production database
+ Set up SSL certificates
+ Documentation
+ Write API documentation
+ Create deployment guide
+ Write security documentation (SECURITY.md)
+ Create user manual
+ Create admin manual
+ Final security audit
+ Perform penetration testing
+ Review security configurations
+ Validate compliance requirements

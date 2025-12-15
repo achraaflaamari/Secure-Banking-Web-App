@@ -1,6 +1,16 @@
 version: '3.8'
 
 services:
+  nginx:
+    build: ./nginx
+    container_name: kma_nginx
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "8081:80"
+      - "8443:443"
+
   postgres:
     image: postgres:15
     container_name: kma_postgres
@@ -20,19 +30,17 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
     depends_on:
       - postgres
-    ports:
-      - "8080:8080"
 
   frontend:
     build: ./frontend
     container_name: kma_frontend
-    ports:
-      - "3000:3000"
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8080/api
+      - NEXT_PUBLIC_API_URL=https://localhost:8443/api
 volumes:
   postgres_data:
