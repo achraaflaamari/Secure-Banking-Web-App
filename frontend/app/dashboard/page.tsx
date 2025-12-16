@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { userAPI } from '@/lib/api';
+import { userAPI, getApiErrorMessage } from '@/lib/api';
 import Link from 'next/link';
 import { LogOut, Send, History, User, Wallet } from 'lucide-react';
 
@@ -11,6 +11,7 @@ interface Profile {
   fullname: string;
   email: string;
   phone: string;
+  rip?: string;
 }
 
 interface Account {
@@ -54,7 +55,7 @@ export default function DashboardPage() {
         setAccount(accountRes.data);
         setTransactions(transactionsRes.data.slice(0, 5)); // Show last 5 transactions
       } catch (err: any) {
-        setError('Failed to load dashboard data');
+        setError(getApiErrorMessage(err) || 'Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
@@ -161,6 +162,10 @@ export default function DashboardPage() {
             <div>
               <p className="text-sm text-gray-600">Phone</p>
               <p className="font-semibold text-gray-800">{profile?.phone || 'Not provided'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">RIP</p>
+              <p className="font-semibold text-gray-800">{profile?.rip || 'Not available'}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Username</p>

@@ -2,15 +2,13 @@ package com.kma.backend.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public class RegisterRequest {
-    @NotBlank
-    @Size(min = 3, max = 50)
-    @Pattern(regexp = "^[a-zA-Z0-9_]+$")
-    private String username;
+import java.time.LocalDate;
 
+public class RegisterRequest {
     @NotBlank
     @Size(min = 6, max = 100)
     private String password;
@@ -30,22 +28,17 @@ public class RegisterRequest {
     @Pattern(regexp = "^[0-9+()\\-\\s]+$")
     private String phone;
 
+    @NotNull
+    private LocalDate birthday;
+
     public RegisterRequest() {}
 
-    public RegisterRequest(String username, String password, String fullname, String email, String phone) {
-        this.username = username;
+    public RegisterRequest(String password, String fullname, String email, String phone, LocalDate birthday) {
         this.password = password;
         this.fullname = fullname;
         this.email = email;
         this.phone = phone;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+        this.birthday = birthday;
     }
 
     public String getPassword() {
@@ -78,5 +71,13 @@ public class RegisterRequest {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public LocalDate getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
     }
 }

@@ -21,6 +21,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -31,6 +34,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String token = authHeader.substring(7);
 
                 if (jwtUtil.isTokenValid(token) && !jwtUtil.isTokenExpired(token)) {
+                    String jti = jwtUtil.extractJti(token);
+                    if (tokenBlacklistService.isRevoked(jti)) {
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
                     String username = jwtUtil.extractUsername(token);
                     String role = jwtUtil.extractRole(token);
 

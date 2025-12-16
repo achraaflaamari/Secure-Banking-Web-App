@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { adminAPI } from '@/lib/api';
+import { adminAPI, getApiErrorMessage } from '@/lib/api';
 
 interface TransactionDTO {
   id: number;
@@ -28,7 +28,6 @@ export default function AdminTransactionsPage() {
   const [userIdFilter, setUserIdFilter] = useState('');
 
   const [selectedTx, setSelectedTx] = useState<TransactionDTO | null>(null);
-  const [newStatus, setNewStatus] = useState('');
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
   const loadTransactions = async () => {
@@ -53,7 +52,7 @@ export default function AdminTransactionsPage() {
         setTransactions(res.data || []);
       }
     } catch (e) {
-      setError('Failed to load transactions');
+      setError(getApiErrorMessage(e) || 'Failed to load transactions');
     } finally {
       setFetching(false);
     }
@@ -77,23 +76,8 @@ export default function AdminTransactionsPage() {
     try {
       const res = await adminAPI.getTransactionById(id);
       setSelectedTx(res.data);
-      setNewStatus(res.data?.status || '');
     } catch (e) {
-      setError('Failed to load transaction details');
-    }
-  };
-
-  const handleUpdateStatus = async (id: number) => {
-    setActionLoading(id);
-    setError('');
-    try {
-      await adminAPI.updateTransactionStatus(id, newStatus);
-      await openDetails(id);
-      await loadTransactions();
-    } catch (e) {
-      setError('Failed to update status');
-    } finally {
-      setActionLoading(null);
+      setError(getApiErrorMessage(e) || 'Failed to load transaction details');
     }
   };
 
@@ -105,7 +89,7 @@ export default function AdminTransactionsPage() {
       await openDetails(id);
       await loadTransactions();
     } catch (e) {
-      setError('Failed to reverse transaction');
+      setError(getApiErrorMessage(e) || 'Failed to reverse transaction');
     } finally {
       setActionLoading(null);
     }
@@ -136,7 +120,7 @@ export default function AdminTransactionsPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Transaction Management</h1>
-            <p className="text-sm text-gray-600">Filter, inspect, update status and reverse transactions</p>
+            <p className="text-sm text-gray-600">Filter, inspect, and reverse transactions</p>
           </div>
           <Link href="/admin" className="text-indigo-700 hover:text-indigo-800 font-semibold">
             ← Back to Admin Dashboard
@@ -239,21 +223,6 @@ export default function AdminTransactionsPage() {
                 <div><span className="font-semibold">Status:</span> {selectedTx.status}</div>
 
                 <div className="pt-3 border-t">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Update status</label>
-                  <input
-                    value={newStatus}
-                    onChange={(e) => setNewStatus(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="REVERSED"
-                  />
-                  <button
-                    onClick={() => handleUpdateStatus(selectedTx.id)}
-                    disabled={actionLoading === selectedTx.id}
-                    className="mt-2 w-full bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 transition disabled:opacity-50"
-                  >
-                    Update
-                  </button>
-
                   <button
                     onClick={() => handleReverse(selectedTx.id)}
                     disabled={actionLoading === selectedTx.id}

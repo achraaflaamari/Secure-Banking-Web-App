@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { adminAPI } from '@/lib/api';
+import { adminAPI, getApiErrorMessage } from '@/lib/api';
 
 interface UserDTO {
   id: number;
@@ -36,7 +36,7 @@ export default function AdminUsersPage() {
         : await adminAPI.getUsers();
       setUsers(res.data || []);
     } catch (e) {
-      setError('Failed to load users');
+      setError(getApiErrorMessage(e) || 'Failed to load users');
     } finally {
       setFetching(false);
     }
@@ -62,7 +62,7 @@ export default function AdminUsersPage() {
       await adminAPI.activateUser(id);
       await loadUsers(query);
     } catch (e) {
-      setError('Failed to activate user');
+      setError(getApiErrorMessage(e) || 'Failed to activate user');
     } finally {
       setActionLoading(null);
     }
@@ -75,20 +75,30 @@ export default function AdminUsersPage() {
       await adminAPI.deactivateUser(id);
       await loadUsers(query);
     } catch (e) {
-      setError('Failed to deactivate user');
+      setError(getApiErrorMessage(e) || 'Failed to deactivate user');
     } finally {
       setActionLoading(null);
     }
   };
 
   const handleDelete = async (id: number) => {
+    const target = users.find((u) => u.id === id);
+    if (target?.username && user?.username && target.username === user.username) {
+      setError('You cannot delete your own account while logged in');
+      return;
+    }
+
+    const ok = window.confirm('Are you sure you want to delete (deactivate) this user?');
+    if (!ok) return;
+
     setActionLoading(id);
     setError('');
     try {
       await adminAPI.deleteUser(id);
+      setUsers((prev) => prev.filter((u) => u.id !== id));
       await loadUsers(query);
     } catch (e) {
-      setError('Failed to delete user');
+      setError(getApiErrorMessage(e) || 'Failed to delete user');
     } finally {
       setActionLoading(null);
     }

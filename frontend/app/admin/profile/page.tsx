@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import api from '@/lib/api';
+import api, { getApiErrorMessage } from '@/lib/api';
 
 interface ProfileDTO {
   id: number;
@@ -40,7 +40,7 @@ export default function AdminProfilePage() {
         birthday: res.data?.birthday ? String(res.data.birthday) : '',
       });
     } catch (e) {
-      setError('Failed to load admin profile');
+      setError(getApiErrorMessage(e) || 'Failed to load admin profile');
     } finally {
       setFetching(false);
     }
@@ -83,7 +83,7 @@ export default function AdminProfilePage() {
       setProfile(res.data);
       setSuccess('Profile updated successfully');
     } catch (e) {
-      setError('Failed to update admin profile');
+      setError(getApiErrorMessage(e) || 'Failed to update admin profile');
     } finally {
       setSaving(false);
     }
@@ -123,48 +123,8 @@ export default function AdminProfilePage() {
           <div className="mb-4 text-sm text-gray-600">
             <div><span className="font-semibold">Username:</span> {user?.username}</div>
             <div><span className="font-semibold">Email:</span> {profile?.email}</div>
+            <div><span className="font-semibold">Password:</span>admin</div>
           </div>
-
-          <form onSubmit={handleSave} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Full name</label>
-              <input
-                name="fullname"
-                value={formData.fullname}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-              <input
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Birthday (YYYY-MM-DD)</label>
-              <input
-                name="birthday"
-                value={formData.birthday}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                placeholder="1990-01-01"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={saving}
-              className="w-full bg-indigo-700 text-white py-2 rounded-lg font-semibold hover:bg-indigo-800 transition disabled:opacity-50"
-            >
-              {saving ? 'Saving...' : 'Save'}
-            </button>
-          </form>
         </div>
       </div>
     </div>

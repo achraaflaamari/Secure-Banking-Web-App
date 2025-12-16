@@ -34,22 +34,28 @@ public class AdminUserSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (userRepository.existsByUsername("admin")) {
+        String adminUsername = System.getenv().getOrDefault("ADMIN_USERNAME", "admin@kma.local");
+        String adminPassword = System.getenv().getOrDefault("ADMIN_PASSWORD", "admin");
+        String adminFullname = System.getenv().getOrDefault("ADMIN_FULLNAME", "Administrator");
+        String adminPhone = System.getenv().getOrDefault("ADMIN_PHONE", "0000000000");
+
+        if (userRepository.existsByUsername(adminUsername)) {
             return;
         }
 
         User admin = new User();
-        admin.setUsername("admin");
-        admin.setPassword(passwordEncoder.encode("admin"));
+        admin.setUsername(adminUsername);
+        admin.setPassword(passwordEncoder.encode(adminPassword));
         admin.setRole("ADMIN");
         User savedAdmin = userRepository.save(admin);
 
         Profile profile = new Profile();
         profile.setUser(savedAdmin);
-        profile.setFullname("Administrator");
-        profile.setEmail("admin@kma.local");
-        profile.setPhone("0000000000");
+        profile.setFullname(adminFullname);
+        profile.setEmail(adminUsername);
+        profile.setPhone(adminPhone);
         profile.setIsActive(true);
         profileRepository.save(profile);
+
     }
 }

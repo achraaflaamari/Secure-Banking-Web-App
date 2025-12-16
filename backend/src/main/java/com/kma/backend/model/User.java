@@ -18,6 +18,9 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Profile profile;
 
@@ -65,6 +68,14 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     public Profile getProfile() {

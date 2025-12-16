@@ -3,6 +3,7 @@ package com.kma.backend.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,7 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
@@ -28,6 +28,9 @@ public class SecurityConfig {
 
     @Autowired
     private RateLimitingFilter rateLimitingFilter;
+
+    @Autowired
+    private CsrfHeaderFilter csrfHeaderFilter;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -75,14 +78,21 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/test-data").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/csrf").permitAll()
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/login/verify").permitAll()
+                        .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/register/verify").permitAll()
+                        .requestMatchers("/api/auth/forgot-password").permitAll()
+                        .requestMatchers("/api/auth/reset-password").permitAll()
+                        .requestMatchers("/api/auth/logout").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(rateLimitingFilter, JwtAuthenticationFilter.class)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(csrfHeaderFilter, RateLimitingFilter.class)
+                .addFilterAfter(jwtAuthenticationFilter, RateLimitingFilter.class);
 
         return http.build();
     }

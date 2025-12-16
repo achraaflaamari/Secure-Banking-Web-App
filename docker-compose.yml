@@ -32,6 +32,11 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+      APP_MAIL_FROM: ${APP_MAIL_FROM}
     depends_on:
       - postgres
 
@@ -41,6 +46,6 @@ services:
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=https://localhost:8443/api
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://localhost:8443/api}
 volumes:
   postgres_data:

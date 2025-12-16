@@ -3,6 +3,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI } from '@/lib/api';
 
+const extractErrorMessage = (err: any): string | null => {
+  const data = err?.response?.data;
+  if (data) {
+    if (typeof data.error === 'string' && data.error.trim()) return data.error;
+    if (typeof data.message === 'string' && data.message.trim()) return data.message;
+  }
+  if (typeof err?.message === 'string' && err.message.trim()) return err.message;
+  return null;
+};
+
 interface User {
   username: string;
   role: string;
@@ -12,8 +22,8 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (username: string, password: string) => Promise<void>;
-  register: (username: string, password: string, fullname: string, email: string, phone: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (password: string, fullname: string, email: string, phone: string, birthday: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -25,21 +35,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const token = localStorage.getItem('token');
-    const username = localStorage.getItem('username');
-    const role = localStorage.getItem('role');
+    const bootstrap = async () => {
+      try {
+        await authAPI.csrf();
 
-    if (token && username && role) {
-      setUser({ token, username, role });
-    }
-    setLoading(false);
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setUser(null);
+          return;
+        }
+
+        const me = await authAPI.me();
+        const { username, role } = me.data;
+        localStorage.setItem('username', username);
+        localStorage.setItem('role', role);
+        setUser({ token, username, role });
+      } catch (e) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('role');
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    bootstrap();
   }, []);
 
-  const login = async (username: string, password: string) => {
+  const login = async (email: string, password: string) => {
     try {
-      const response = await authAPI.login({ username, password });
-      const { token, username: responseUsername, role } = response.data;
+      const response = await authAPI.login({ email, password });
+      const { token, username: responseUsername, role, message } = response.data;
+
+      if (!token && message === 'OTP_REQUIRED') {
+        localStorage.setItem('pending_otp_email', String(email || '').trim().toLowerCase());
+        throw new Error('OTP_REQUIRED');
+      }
 
       localStorage.setItem('token', token);
       localStorage.setItem('username', responseUsername);
@@ -47,27 +79,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser({ token, username: responseUsername, role });
     } catch (error) {
-      throw new Error('Login failed');
+      if (error instanceof Error && (error.message === 'OTP_REQUIRED' || error.message === 'OTP_SENT')) {
+        throw error;
+      }
+      throw new Error(extractErrorMessage(error) || 'Login failed');
     }
   };
 
   const register = async (
-    username: string,
     password: string,
     fullname: string,
     email: string,
-    phone: string
+    phone: string,
+    birthday: string
   ) => {
     try {
       const response = await authAPI.register({
-        username,
         password,
         fullname,
         email,
         phone,
+        birthday,
       });
 
-      const { token, username: responseUsername, role } = response.data;
+      const { token, username: responseUsername, role, message } = response.data;
+
+      if (!token && message === 'OTP_SENT') {
+        localStorage.setItem('pending_otp_email', String(email || '').trim().toLowerCase());
+        throw new Error('OTP_SENT');
+      }
 
       localStorage.setItem('token', token);
       localStorage.setItem('username', responseUsername);
@@ -75,15 +115,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser({ token, username: responseUsername, role });
     } catch (error) {
-      throw new Error('Registration failed');
+      if (error instanceof Error && (error.message === 'OTP_SENT' || error.message === 'OTP_REQUIRED')) {
+        throw error;
+      }
+      throw new Error(extractErrorMessage(error) || 'Registration failed');
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('role');
-    setUser(null);
+    try {
+      authAPI.logout();
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('role');
+      setUser(null);
+    }
   };
 
   return (

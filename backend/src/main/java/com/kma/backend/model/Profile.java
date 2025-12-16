@@ -21,6 +21,9 @@ public class Profile {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(unique = true)
+    private String rip;
+
     @Column
     private String phone;
 
@@ -91,6 +94,14 @@ public class Profile {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRip() {
+        return rip;
+    }
+
+    public void setRip(String rip) {
+        this.rip = rip;
     }
 
     public String getPhone() {

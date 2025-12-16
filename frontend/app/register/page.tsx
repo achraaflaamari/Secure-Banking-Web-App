@@ -8,11 +8,11 @@ import { UserPlus } from 'lucide-react';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    username: '',
     password: '',
     fullname: '',
     email: '',
     phone: '',
+    birthday: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,8 +32,24 @@ export default function RegisterPage() {
     setError('');
 
     // Validation
-    if (!formData.username || !formData.password || !formData.fullname || !formData.email) {
+    if (!formData.password || !formData.fullname || !formData.email || !formData.birthday) {
       setError('Please fill in all required fields');
+      return;
+    }
+
+    const birthDate = new Date(formData.birthday);
+    if (!Number.isFinite(birthDate.getTime())) {
+      setError('Invalid birthday');
+      return;
+    }
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age -= 1;
+    }
+    if (age < 18) {
+      setError('You must be at least 18 years old');
       return;
     }
 
@@ -51,14 +67,18 @@ export default function RegisterPage() {
 
     try {
       await register(
-        formData.username,
         formData.password,
         formData.fullname,
         formData.email,
-        formData.phone
+        formData.phone,
+        formData.birthday
       );
       router.push('/dashboard');
     } catch (err: any) {
+      if (err?.message === 'OTP_SENT') {
+        router.push('/register/verify');
+        return;
+      }
       setError(err.message || 'Registration failed');
     } finally {
       setLoading(false);
@@ -83,19 +103,6 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Username *</label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Choose a username"
-              required
-            />
-          </div>
-
-          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
             <input
               type="text"
@@ -116,7 +123,19 @@ export default function RegisterPage() {
               value={formData.email}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="your@email.com"
+              placeholder="Your email"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Birthday *</label>
+            <input
+              type="date"
+              name="birthday"
+              value={formData.birthday}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             />
           </div>

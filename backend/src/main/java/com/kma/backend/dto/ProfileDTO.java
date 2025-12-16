@@ -8,6 +8,7 @@ public class ProfileDTO {
     private Long userId;
     private String fullname;
     private String email;
+    private String rip;
     private String phone;
     private LocalDate birthday;
     private LocalDateTime createdAt;
@@ -58,6 +59,14 @@ public class ProfileDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRip() {
+        return rip;
+    }
+
+    public void setRip(String rip) {
+        this.rip = rip;
     }
 
     public String getPhone() {

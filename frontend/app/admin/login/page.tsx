@@ -9,7 +9,7 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const { user, login, loading, isAuthenticated } = useAuth();
 
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
     setSubmitting(true);
 
     try {
-      await login(username, password);
+      await login(email, password);
       const role = localStorage.getItem('role');
       if (role !== 'ADMIN') {
         setError('Access denied: admin role required');
@@ -63,13 +63,13 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="admin"
+              placeholder="admin@kma.local"
               required
             />
           </div>

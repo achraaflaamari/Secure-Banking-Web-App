@@ -10,8 +10,8 @@ import java.math.BigDecimal;
 public class TransactionRequest {
     @NotBlank
     @Size(min = 3, max = 50)
-    @Pattern(regexp = "^[a-zA-Z0-9_]+$")
-    private String receiverUsername;
+    @Pattern(regexp = "^[a-zA-Z0-9\\-]+$")
+    private String receiverRip;
 
     @NotNull
     @DecimalMin(value = "0.01")
@@ -19,17 +19,17 @@ public class TransactionRequest {
 
     public TransactionRequest() {}
 
-    public TransactionRequest(String receiverUsername, BigDecimal amount) {
-        this.receiverUsername = receiverUsername;
+    public TransactionRequest(String receiverRip, BigDecimal amount) {
+        this.receiverRip = receiverRip;
         this.amount = amount;
     }
 
-    public String getReceiverUsername() {
-        return receiverUsername;
+    public String getReceiverRip() {
+        return receiverRip;
     }
 
-    public void setReceiverUsername(String receiverUsername) {
-        this.receiverUsername = receiverUsername;
+    public void setReceiverRip(String receiverRip) {
+        this.receiverRip = receiverRip;
     }
 
     public BigDecimal getAmount() {

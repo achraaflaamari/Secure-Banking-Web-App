@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
@@ -10,7 +10,7 @@ export default function TransactionPage() {
   const router = useRouter();
   const { isAuthenticated, loading } = useAuth();
 
-  const [receiverUsername, setReceiverUsername] = useState('');
+  const [receiverRip, setReceiverRip] = useState('');
   const [amount, setAmount] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -23,12 +23,12 @@ export default function TransactionPage() {
     }
   }, [isAuthenticated, loading, router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    if (!receiverUsername || !amount) {
+    if (!receiverRip || !amount) {
       setError('Please fill in all fields');
       return;
     }
@@ -41,12 +41,15 @@ export default function TransactionPage() {
 
     setSubmitting(true);
     try {
-      await userAPI.createTransaction({ receiverUsername, amount: parsed });
-      setSuccess('Transaction created successfully');
-      setReceiverUsername('');
-      setAmount('');
+      const res = await userAPI.initiateTransaction({ receiverRip, amount: parsed });
+      const { transactionId, message } = res.data;
+      if (message === 'OTP_REQUIRED' && transactionId) {
+        router.push(`/transaction/verify?id=${transactionId}`);
+        return;
+      }
+      setError('Failed to initiate transaction');
     } catch (e) {
-      setError('Failed to create transaction');
+      setError('Failed to initiate transaction');
     } finally {
       setSubmitting(false);
     }
@@ -85,12 +88,12 @@ export default function TransactionPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Receiver Username</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Receiver RIP</label>
               <input
-                value={receiverUsername}
-                onChange={(e) => setReceiverUsername(e.target.value)}
+                value={receiverRip}
+                onChange={(e) => setReceiverRip(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                placeholder="receiver username"
+                placeholder="RIP"
                 required
               />
             </div>

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { LogIn } from 'lucide-react';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,9 +20,13 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login(username, password);
+      await login(email, password);
       router.push('/dashboard');
     } catch (err: any) {
+      if (err?.message === 'OTP_REQUIRED') {
+        router.push('/login/verify');
+        return;
+      }
       setError(err.message || 'Login failed');
     } finally {
       setLoading(false);
@@ -47,13 +51,13 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Enter your username"
+              placeholder="your@email.com"
               required
             />
           </div>
@@ -78,6 +82,12 @@ export default function LoginPage() {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
+
+        <p className="text-center text-gray-600 mt-4">
+          <Link href="/forgot-password" className="text-indigo-600 hover:text-indigo-700 font-semibold">
+            Forgot password?
+          </Link>
+        </p>
 
         <p className="text-center text-gray-600 mt-6">
           Don't have an account?{' '}

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.UUID;
 import java.util.Date;
 
 @Component
@@ -23,8 +24,10 @@ public class JwtUtil {
     }
 
     public String generateToken(String username, String role) {
+        String jti = UUID.randomUUID().toString();
         return Jwts.builder()
                 .subject(username)
+                .id(jti)
                 .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
@@ -48,6 +51,25 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload()
                 .get("role", String.class);
+    }
+
+    public String extractJti(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getId();
+    }
+
+    public long extractExpirationEpochMs(String token) {
+        Date expiration = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration();
+        return expiration.getTime();
     }
 
     public boolean isTokenValid(String token) {
